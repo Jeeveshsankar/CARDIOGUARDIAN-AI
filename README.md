@@ -1,6 +1,6 @@
 # CardioGuardian AI
 
-A full-stack cardiovascular health monitoring application built with Flutter and FastAPI. Features an ML-powered risk prediction engine, real-time Excel data persistence, and an intelligent AI health assistant.
+CardioGuardian AI is a clinical-grade health monitoring ecosystem designed for precision cardiovascular tracking. It integrates advanced machine learning for heart disease risk assessment, secure data persistence via a hybrid local/remote architecture, and an intelligent clinical analytics dashboard.
 
 ## Features
 

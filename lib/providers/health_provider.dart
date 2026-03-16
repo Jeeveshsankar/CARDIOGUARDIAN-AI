@@ -139,7 +139,7 @@ class HealthProvider with ChangeNotifier {
 
   Future<bool> deletePatient(String patientId) async {
     await LocalDatabase.deletePatient(patientId);
-    final ok = await ApiService.deletePatient(patientId);
+    await ApiService.deletePatient(patientId);
     
     if (_selectedPatient?['id'] == patientId) {
       _selectedPatient = null;
