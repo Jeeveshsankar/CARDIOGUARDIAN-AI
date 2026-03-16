@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cardioguardian/core/api_service.dart';
 import 'package:cardioguardian/core/app_theme.dart';
-import 'package:cardioguardian/screens/splash_screen.dart';
+import 'package:cardioguardian/screens/startup_screen.dart';
 import 'package:cardioguardian/providers/health_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +27,8 @@ class CardioGuardianApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'CardioGuardian AI',
       theme: AppTheme.darkTheme,
-      home: const SplashScreen(),
+      home: const StartupScreen(),
     );
   }
 }
+

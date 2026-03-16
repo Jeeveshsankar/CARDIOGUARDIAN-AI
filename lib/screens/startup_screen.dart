@@ -4,14 +4,14 @@ import 'package:cardioguardian/core/app_theme.dart';
 import 'package:cardioguardian/screens/main_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class StartupScreen extends StatefulWidget {
+  const StartupScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<StartupScreen> createState() => _StartupScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+class _StartupScreenState extends State<StartupScreen> with TickerProviderStateMixin {
   late AnimationController _orbController;
   late AnimationController _pulseController;
   late AnimationController _fadeController;
@@ -370,3 +370,4 @@ class _OrbPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _OrbPainter old) => true;
 }
+
