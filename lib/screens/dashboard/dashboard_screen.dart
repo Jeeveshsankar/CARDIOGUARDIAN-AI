@@ -115,7 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return GlassContainer(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       gradientColors: [
-        connected ? Colors.greenAccent.withValues(alpha: 0.1) : Colors.redAccent.withValues(alpha: 0.1),
+        connected ? Colors.greenAccent.withValues(alpha: 0.1) : AppTheme.primaryColor.withValues(alpha: 0.1),
         Colors.transparent,
       ],
       child: Row(
@@ -123,11 +123,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Container(
             width: 8, height: 8,
             decoration: BoxDecoration(
-              color: connected ? Colors.greenAccent : Colors.redAccent,
+              color: connected ? Colors.greenAccent : AppTheme.primaryColor,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: (connected ? Colors.greenAccent : Colors.redAccent).withValues(alpha: 0.5),
+                  color: (connected ? Colors.greenAccent : AppTheme.primaryColor).withValues(alpha: 0.5),
                   blurRadius: 6,
                 ),
               ],
@@ -135,19 +135,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              connected ? "Backend Connected • Excel Database Active" : "Backend Offline • Check server or WiFi",
-              style: GoogleFonts.outfit(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: connected ? Colors.greenAccent : Colors.redAccent,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  connected ? "CLOUD ENGINE ACTIVE" : "LOCAL ENGINE ACTIVE",
+                  style: GoogleFonts.outfit(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                    color: connected ? Colors.greenAccent : AppTheme.primaryColor,
+                  ),
+                ),
+                Text(
+                  connected ? "Syncing with Excel Database" : "Working Offline • Autosync when ready",
+                  style: GoogleFonts.outfit(
+                    fontSize: 10,
+                    color: Colors.white54,
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            ApiService.baseUrl,
-            style: GoogleFonts.outfit(fontSize: 10, color: Colors.white24),
-          ),
+          if (!connected)
+            Icon(Icons.bolt, color: AppTheme.primaryColor, size: 16),
+          if (connected)
+            const Icon(Icons.cloud_done_rounded, color: Colors.greenAccent, size: 16),
         ],
       ),
     );

@@ -123,9 +123,12 @@ class PredictionScreen extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Calculated Risk Score", style: GoogleFonts.outfit(fontSize: 14, color: Colors.white54)),
+                  Text(provider.isConnected ? "Cloud AI Risk Score" : "Local Engine Risk Score", 
+                    style: GoogleFonts.outfit(fontSize: 14, color: Colors.white54)),
                   const SizedBox(height: 8),
                   Text("${provider.riskScore}%", style: GoogleFonts.outfit(fontSize: 40, fontWeight: FontWeight.bold, color: Colors.white)),
+                  if (!provider.isConnected)
+                    Text("Offline Prediction Mode", style: GoogleFonts.outfit(fontSize: 10, color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
                 ],
               ),
               Container(

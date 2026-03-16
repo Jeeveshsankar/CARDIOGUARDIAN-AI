@@ -1,5 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/core/api_service.dart';
+import 'package:flutter_application_1/core/local_database.dart';
+import 'package:flutter_application_1/core/local_predictor.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HealthProvider with ChangeNotifier {
   List<dynamic> _patients = [];
@@ -18,6 +22,9 @@ class HealthProvider with ChangeNotifier {
   bool _isConnected = false;
   String _connectionStatus = "Checking...";
 
+  bool _isOnline = false;
+  StreamSubscription? _connectivitySubscription;
+
   List<dynamic> get patients => _patients;
   List<dynamic> get visits => _visits;
   List<dynamic> get reports => _reports;
@@ -31,7 +38,33 @@ class HealthProvider with ChangeNotifier {
   String get riskStatus => _riskStatus;
   bool get isLoading => _isLoading;
   bool get isConnected => _isConnected;
+  bool get isOnline => _isOnline;
   String get connectionStatus => _connectionStatus;
+
+  HealthProvider() {
+    _initConnectivity();
+    refreshAll();
+  }
+
+  void _initConnectivity() {
+    Connectivity().checkConnectivity().then((result) {
+      _updateConnectionStatus(result);
+    });
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      _updateConnectionStatus(result);
+    });
+  }
+
+  void _updateConnectionStatus(List<ConnectivityResult> results) {
+    _isOnline = results.any((r) => r != ConnectivityResult.none);
+    checkConnection();
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription?.cancel();
+    super.dispose();
+  }
 
   void setTabIndex(int index) {
     _currentTabIndex = index;
@@ -55,24 +88,43 @@ class HealthProvider with ChangeNotifier {
   }
 
   Future<void> fetchPatients() async {
-    _patients = await ApiService.getPatients();
+    // Hybrid Fetch
+    final remotePatients = await ApiService.getPatients();
+    if (remotePatients.isNotEmpty) {
+      _patients = remotePatients;
+      for (var p in remotePatients) {
+        await LocalDatabase.savePatient(p);
+      }
+    } else {
+      _patients = await LocalDatabase.getPatients();
+    }
     notifyListeners();
   }
 
   Future<bool> registerPatient(String name, int age, String gender, String contact) async {
-    final patient = await ApiService.addPatient({
+    final Map<String, dynamic> data = {
+      "id": DateTime.now().millisecondsSinceEpoch.toString(),
       "name": name,
       "age": age,
       "gender": gender,
       "contact": contact,
-    });
+    };
+
+    // 1. Save locally immediately (Offline Support)
+    await LocalDatabase.savePatient(data);
+    
+    // 2. Try Remote
+    final patient = await ApiService.addPatient(data);
+    
+    // Refresh UI
+    await fetchPatients();
     if (patient != null) {
-      await fetchPatients();
       await scheduleVisit(patient['id'], patient['name'], "General Checkup");
-      await fetchDashboardStats();
-      return true;
+    } else {
+      await scheduleVisit(data['id'], data['name'], "General Checkup (Offline)");
     }
-    return false;
+    await fetchDashboardStats();
+    return true;
   }
 
   Future<bool> updatePatient(String patientId, Map<String, dynamic> updates) async {
@@ -86,52 +138,64 @@ class HealthProvider with ChangeNotifier {
   }
 
   Future<bool> deletePatient(String patientId) async {
+    await LocalDatabase.deletePatient(patientId);
     final ok = await ApiService.deletePatient(patientId);
-    if (ok) {
-      if (_selectedPatient?['id'] == patientId) {
-        _selectedPatient = null;
-        _pendingVitals = null;
-        _riskScore = 0.0;
-        _riskStatus = "No Patient Selected";
-      }
-      await fetchPatients();
-      await fetchVisits();
-      await fetchDashboardStats();
+    
+    if (_selectedPatient?['id'] == patientId) {
+      _selectedPatient = null;
+      _pendingVitals = null;
+      _riskScore = 0.0;
+      _riskStatus = "No Patient Selected";
     }
-    return ok;
+    await fetchPatients();
+    await fetchVisits();
+    await fetchDashboardStats();
+    return true; // Always return true because it was deleted locally
   }
 
   Future<void> fetchVisits() async {
-    _visits = await ApiService.getVisits();
+    final remoteVisits = await ApiService.getVisits();
+    if (remoteVisits.isNotEmpty) {
+      _visits = remoteVisits;
+      for (var v in remoteVisits) {
+        await LocalDatabase.saveVisit(v);
+      }
+    } else {
+      _visits = await LocalDatabase.getVisits();
+    }
     notifyListeners();
   }
 
   Future<void> scheduleVisit(String pId, String pName, String purpose) async {
-    await ApiService.addVisit({
+    final visit = {
+      "id": DateTime.now().millisecondsSinceEpoch.toString(),
       "patient_id": pId,
       "patient_name": pName,
       "purpose": purpose,
-    });
+      "status": "Pending",
+    };
+    
+    await LocalDatabase.saveVisit(visit);
+    await ApiService.addVisit(visit);
+    
     await fetchVisits();
     await fetchDashboardStats();
   }
 
   Future<bool> completeVisit(String visitId) async {
-    final ok = await ApiService.updateVisitStatus(visitId, "Completed");
-    if (ok) {
-      await fetchVisits();
-      await fetchDashboardStats();
-    }
-    return ok;
+    await LocalDatabase.updateVisitStatus(visitId, "Completed");
+    await ApiService.updateVisitStatus(visitId, "Completed");
+    await fetchVisits();
+    await fetchDashboardStats();
+    return true;
   }
 
   Future<bool> deleteVisit(String visitId) async {
-    final ok = await ApiService.deleteVisit(visitId);
-    if (ok) {
-      await fetchVisits();
-      await fetchDashboardStats();
-    }
-    return ok;
+    await LocalDatabase.deleteVisit(visitId);
+    await ApiService.deleteVisit(visitId);
+    await fetchVisits();
+    await fetchDashboardStats();
+    return true;
   }
 
   void selectPatient(Map<String, dynamic> patient) {
@@ -176,12 +240,22 @@ class HealthProvider with ChangeNotifier {
         "thal": 2
       };
 
-      final result = await ApiService.getRiskPrediction(signals);
-      _riskScore = (result['risk_score'] as num).toDouble();
-      _riskStatus = result['status'];
+      if (_isConnected) {
+        final result = await ApiService.getRiskPrediction(signals);
+        _riskScore = (result['risk_score'] as num).toDouble();
+        _riskStatus = result['status'];
+      } else {
+        // Use Local Predictor when offline
+        final result = LocalPredictor.predictHeartRisk(signals);
+        _riskScore = result['risk_score'];
+        _riskStatus = result['status'];
+      }
     } catch (e) {
-      debugPrint("Provider Error: $e");
-      _riskStatus = "Connection Error";
+      debugPrint("Provider Prediction Error: $e");
+      // Fallback to local on error
+      final result = LocalPredictor.predictHeartRisk(_pendingVitals ?? {});
+      _riskScore = result['risk_score'];
+      _riskStatus = result['status'];
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -192,49 +266,83 @@ class HealthProvider with ChangeNotifier {
     if (_selectedPatient == null) return false;
 
     final report = {
+      "id": DateTime.now().millisecondsSinceEpoch.toString(),
       "patient_id": _selectedPatient!['id'],
       "patient_name": _selectedPatient!['name'],
       "risk_score": _riskScore,
       "risk_status": _riskStatus,
       "vitals": _pendingVitals ?? {},
+      "timestamp": DateTime.now().toString(),
     };
 
-    final result = await ApiService.saveReport(report);
-    if (result != null) {
-      await fetchReports();
-      await fetchDashboardStats();
-      return true;
-    }
-    return false;
+    // Save locally
+    await LocalDatabase.saveReport(report);
+    
+    // Save remotely
+    await ApiService.saveReport(report);
+    
+    await fetchReports();
+    await fetchDashboardStats();
+    return true;
   }
 
   Future<void> fetchReports() async {
-    _reports = await ApiService.getReports();
+    final remoteReports = await ApiService.getReports();
+    if (remoteReports.isNotEmpty) {
+      _reports = remoteReports;
+      for (var r in remoteReports) {
+        await LocalDatabase.saveReport(r);
+      }
+    } else {
+      _reports = await LocalDatabase.getReports();
+    }
     notifyListeners();
   }
 
   Future<bool> logVital(String type, String value, String unit, {String? patientId, String? patientName}) async {
-    final result = await ApiService.logVitalEntry({
+    final vital = {
       "patient_id": patientId ?? _selectedPatient?['id'] ?? "",
       "patient_name": patientName ?? _selectedPatient?['name'] ?? "General",
       "type": type,
       "value": value,
       "unit": unit,
-    });
-    if (result != null) {
-      await fetchVitals();
-      return true;
-    }
-    return false;
+      "timestamp": DateTime.now().toString(),
+    };
+
+    await LocalDatabase.saveVital(vital);
+    await ApiService.logVitalEntry(vital);
+    
+    await fetchVitals();
+    return true;
   }
 
   Future<void> fetchVitals() async {
-    _vitals = await ApiService.getVitals();
+    final remoteVitals = await ApiService.getVitals();
+    if (remoteVitals.isNotEmpty) {
+      _vitals = remoteVitals;
+      for (var v in remoteVitals) {
+        await LocalDatabase.saveVital(v);
+      }
+    } else {
+      _vitals = await LocalDatabase.getVitals();
+    }
     notifyListeners();
   }
 
   Future<void> fetchDashboardStats() async {
-    _dashboardStats = await ApiService.getDashboardStats();
+    final result = await ApiService.getDashboardStats();
+    if (result.isNotEmpty) {
+      _dashboardStats = result;
+    } else {
+      // Build local stats if offline
+      _dashboardStats = {
+        "total_patients": _patients.length,
+        "total_visits": _visits.length,
+        "total_reports": _reports.length,
+        "server_status": "Offline (Local Engine)",
+        "mode": "Local"
+      };
+    }
     notifyListeners();
   }
 
