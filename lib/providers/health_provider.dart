@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/api_service.dart';
-import 'package:flutter_application_1/core/local_database.dart';
-import 'package:flutter_application_1/core/local_predictor.dart';
+import 'package:cardioguardian/core/api_service.dart';
+import 'package:cardioguardian/core/local_database.dart';
+import 'package:cardioguardian/core/local_predictor.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class HealthProvider with ChangeNotifier {

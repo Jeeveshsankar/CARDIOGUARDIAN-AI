@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/dashboard/dashboard_screen.dart';
-import 'package:flutter_application_1/screens/patients/patients_screen.dart';
-import 'package:flutter_application_1/screens/visits/visits_screen.dart';
-import 'package:flutter_application_1/screens/prediction/prediction_screen.dart';
-import 'package:flutter_application_1/screens/assistant/assistant_screen.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
+import 'package:cardioguardian/screens/dashboard/splash_dashboard.dart';
+import 'package:cardioguardian/screens/patients/splash_patients.dart';
+import 'package:cardioguardian/screens/visits/splash_visits.dart';
+import 'package:cardioguardian/screens/prediction/splash_prediction.dart';
+import 'package:cardioguardian/screens/assistant/splash_assistant.dart';
+import 'package:cardioguardian/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/health_provider.dart';
+import 'package:cardioguardian/providers/health_provider.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -114,3 +114,4 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 }
+

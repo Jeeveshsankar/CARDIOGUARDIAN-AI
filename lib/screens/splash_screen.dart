@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
-import 'package:flutter_application_1/screens/main_navigation.dart';
+import 'package:cardioguardian/core/app_theme.dart';
+import 'package:cardioguardian/screens/main_navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SplashScreen extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/glass_container.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
+import 'package:cardioguardian/widgets/glass_container.dart';
+import 'package:cardioguardian/core/app_theme.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/health_provider.dart';
+import 'package:cardioguardian/providers/health_provider.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});

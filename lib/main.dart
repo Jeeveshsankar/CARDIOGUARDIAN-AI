@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/core/api_service.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
-import 'package:flutter_application_1/screens/splash_screen.dart';
-import 'package:flutter_application_1/providers/health_provider.dart';
+import 'package:cardioguardian/core/api_service.dart';
+import 'package:cardioguardian/core/app_theme.dart';
+import 'package:cardioguardian/screens/splash_screen.dart';
+import 'package:cardioguardian/providers/health_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/glass_container.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
+import 'package:cardioguardian/widgets/glass_container.dart';
+import 'package:cardioguardian/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:flutter_application_1/screens/emergency/emergency_screen.dart';
-import 'package:flutter_application_1/screens/doctor/doctor_screen.dart';
+import 'package:cardioguardian/screens/emergency/splash_emergency.dart';
+import 'package:cardioguardian/screens/doctor/splash_doctor.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/health_provider.dart';
-import 'package:flutter_application_1/core/api_service.dart';
-import 'package:flutter_application_1/screens/settings/settings_screen.dart';
+import 'package:cardioguardian/providers/health_provider.dart';
+import 'package:cardioguardian/core/api_service.dart';
+import 'package:cardioguardian/screens/settings/splash_settings.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -366,3 +366,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/widgets/glass_container.dart';
-import 'package:flutter_application_1/core/app_theme.dart';
+import 'package:cardioguardian/widgets/glass_container.dart';
+import 'package:cardioguardian/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/providers/health_provider.dart';
-import 'package:flutter_application_1/core/api_service.dart';
+import 'package:cardioguardian/providers/health_provider.dart';
+import 'package:cardioguardian/core/api_service.dart';
 
 class VisitsScreen extends StatefulWidget {
   const VisitsScreen({super.key});
