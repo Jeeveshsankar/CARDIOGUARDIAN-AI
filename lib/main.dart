@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cardioguardian/core/api_service.dart';
 import 'package:cardioguardian/core/app_theme.dart';
-import 'package:cardioguardian/screens/startup_screen.dart';
+import 'package:cardioguardian/screens/startup.dart';
 import 'package:cardioguardian/providers/health_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -10,9 +10,7 @@ void main() async {
   await ApiService.initialize();
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => HealthProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => HealthProvider())],
       child: const CardioGuardianApp(),
     ),
   );
@@ -31,4 +29,3 @@ class CardioGuardianApp extends StatelessWidget {
     );
   }
 }
-

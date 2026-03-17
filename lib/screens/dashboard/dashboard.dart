@@ -3,12 +3,12 @@ import 'package:cardioguardian/widgets/glass_container.dart';
 import 'package:cardioguardian/core/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:cardioguardian/screens/emergency/emergency_screen.dart';
-import 'package:cardioguardian/screens/doctor/doctor_screen.dart';
+import 'package:cardioguardian/screens/emergency/emergency.dart';
+import 'package:cardioguardian/screens/doctor/doctor.dart';
 import 'package:provider/provider.dart';
 import 'package:cardioguardian/providers/health_provider.dart';
 import 'package:cardioguardian/core/api_service.dart';
-import 'package:cardioguardian/screens/settings/settings_screen.dart';
+import 'package:cardioguardian/screens/settings/settings.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

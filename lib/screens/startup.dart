@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cardioguardian/core/app_theme.dart';
-import 'package:cardioguardian/screens/main_navigation.dart';
+import 'package:cardioguardian/screens/navigation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class StartupScreen extends StatefulWidget {

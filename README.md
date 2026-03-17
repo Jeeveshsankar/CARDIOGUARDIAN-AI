@@ -61,8 +61,8 @@ lib/
 ├── providers/
 │   └── health_provider.dart
 ├── screens/
-│   ├── startup_screen.dart
-│   ├── main_navigation.dart
+│   ├── startup.dart
+│   ├── navigation.dart
 │   ├── dashboard/
 │   ├── patients/
 │   ├── visits/
